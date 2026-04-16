@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-import random
+import secrets
 
 
 ROOT_DIR = Path(__file__).parent
@@ -113,14 +113,14 @@ def generate_mock_inmates():
             "id": str(uuid.uuid4()),
             "name": name,
             "inmateId": f"INM-{1000 + i}",
-            "riskLevel": random.choice(risk_levels),
-            "attendance": random.randint(60, 98),
-            "behaviorScore": random.randint(65, 95),
-            "attendanceTrend": random.choice(["up", "down"]),
-            "behaviorTrend": random.choice(["up", "down"]),
-            "programs": random.choice(programs),
-            "completedPrograms": random.randint(0, 5),
-            "timeInProgram": f"{random.randint(3, 24)}mo",
+            "riskLevel": secrets.choice(risk_levels),
+            "attendance": secrets.randbelow(39) + 60,  # 60-98
+            "behaviorScore": secrets.randbelow(31) + 65,  # 65-95
+            "attendanceTrend": secrets.choice(["up", "down"]),
+            "behaviorTrend": secrets.choice(["up", "down"]),
+            "programs": secrets.choice(programs),
+            "completedPrograms": secrets.randbelow(6),  # 0-5
+            "timeInProgram": f"{secrets.randbelow(22) + 3}mo",  # 3-24mo
             "riskNotes": "Assessment based on recent behavioral patterns and attendance trends.",
             "recentNotes": [
                 {
@@ -157,13 +157,13 @@ def generate_mock_sessions():
         session = {
             "id": str(uuid.uuid4()),
             "title": f"Session {i+1}",
-            "type": random.choice(session_types),
-            "date": random.choice(dates),
-            "time": f"{random.randint(8, 16):02d}:00",
-            "location": f"Room {random.randint(101, 110)}",
-            "staff": random.choice(["Dr. Sarah Johnson", "Michael Chen", "Emily Rodriguez", "David Martinez"]),
-            "capacity": random.randint(8, 15),
-            "enrolled": random.randint(4, 12),
+            "type": secrets.choice(session_types),
+            "date": secrets.choice(dates),
+            "time": f"{secrets.randbelow(9) + 8:02d}:00",  # 8-16
+            "location": f"Room {secrets.randbelow(10) + 101}",  # 101-110
+            "staff": secrets.choice(["Dr. Sarah Johnson", "Michael Chen", "Emily Rodriguez", "David Martinez"]),
+            "capacity": secrets.randbelow(8) + 8,  # 8-15
+            "enrolled": secrets.randbelow(9) + 4,  # 4-12
             "notes": "Regular session focused on skill development and progress tracking."
         }
         sessions.append(session)

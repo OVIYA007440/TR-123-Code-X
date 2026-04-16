@@ -23,6 +23,17 @@ import { format } from 'date-fns';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Helper function to get session color
+const getSessionColor = (type) => {
+  const colorMap = {
+    counseling: 'bg-accent/10 text-accent border-accent/20',
+    vocational: 'bg-success/10 text-success border-success/20',
+    educational: 'bg-warning/10 text-warning border-warning/20',
+    therapy: 'bg-chart-3/10 text-chart-3 border-chart-3/20',
+  };
+  return colorMap[type] || 'bg-muted text-muted-foreground border-border';
+};
+
 export default function SchedulePage({ user }) {
   const [date, setDate] = useState(new Date());
   const [sessions, setSessions] = useState([]);
@@ -42,6 +53,8 @@ export default function SchedulePage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filterSessionsByDate = useCallback(() => {
@@ -57,21 +70,6 @@ export default function SchedulePage({ user }) {
   useEffect(() => {
     filterSessionsByDate();
   }, [filterSessionsByDate]);
-
-  const getSessionColor = (type) => {
-    switch (type) {
-      case 'counseling':
-        return 'bg-accent/10 text-accent border-accent/20';
-      case 'vocational':
-        return 'bg-success/10 text-success border-success/20';
-      case 'educational':
-        return 'bg-warning/10 text-warning border-warning/20';
-      case 'therapy':
-        return 'bg-chart-3/10 text-chart-3 border-chart-3/20';
-      default:
-        return 'bg-muted text-muted-foreground border-border';
-    }
-  };
 
   if (loading) {
     return (

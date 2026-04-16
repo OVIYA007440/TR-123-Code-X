@@ -10,6 +10,16 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Chart styling constants
+const CHART_TOOLTIP_STYLE = {
+  backgroundColor: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '0.5rem',
+};
+
+const CHART_DOT_STYLE = { fill: 'hsl(var(--accent))' };
+const BAR_RADIUS = [8, 8, 0, 0];
+
 export default function OverviewPage({ user }) {
   const [stats, setStats] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
@@ -32,6 +42,8 @@ export default function OverviewPage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports - no need to include in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -138,14 +150,10 @@ export default function OverviewPage({ user }) {
                 <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '0.5rem',
-                  }}
+                  contentStyle={CHART_TOOLTIP_STYLE}
                 />
-                <Line type="monotone" dataKey="attendance" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: 'hsl(var(--accent))' }} />
-                <Line type="monotone" dataKey="behavior" stroke="hsl(var(--success))" strokeWidth={2} dot={{ fill: 'hsl(var(--success))' }} />
+                <Line type="monotone" dataKey="attendance" stroke="hsl(var(--accent))" strokeWidth={2} dot={CHART_DOT_STYLE} />
+                <Line type="monotone" dataKey="behavior" stroke="hsl(var(--success))" strokeWidth={2} dot={CHART_DOT_STYLE} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -164,13 +172,9 @@ export default function OverviewPage({ user }) {
                 <XAxis dataKey="level" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '0.5rem',
-                  }}
+                  contentStyle={CHART_TOOLTIP_STYLE}
                 />
-                <Bar dataKey="count" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill="hsl(var(--accent))" radius={BAR_RADIUS} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

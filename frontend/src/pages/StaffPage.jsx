@@ -11,6 +11,26 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Helper function to get user initials
+const getInitials = (name) => {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+};
+
+// Helper function to get role color
+const getRoleColor = (role) => {
+  const colorMap = {
+    counselor: 'bg-accent/10 text-accent border-accent/20',
+    therapist: 'bg-success/10 text-success border-success/20',
+    educator: 'bg-warning/10 text-warning border-warning/20',
+    coordinator: 'bg-chart-3/10 text-chart-3 border-chart-3/20',
+  };
+  return colorMap[role] || 'bg-muted text-muted-foreground border-border';
+};
+
 export default function StaffPage({ user }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,34 +47,13 @@ export default function StaffPage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff]);
-
-  const getInitials = (name) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'counselor':
-        return 'bg-accent/10 text-accent border-accent/20';
-      case 'therapist':
-        return 'bg-success/10 text-success border-success/20';
-      case 'educator':
-        return 'bg-warning/10 text-warning border-warning/20';
-      case 'coordinator':
-        return 'bg-chart-3/10 text-chart-3 border-chart-3/20';
-      default:
-        return 'bg-muted text-muted-foreground border-border';
-    }
-  };
 
   if (loading) {
     return (

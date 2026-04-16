@@ -22,6 +22,25 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Helper function to get risk badge styling
+const getRiskBadgeClass = (risk) => {
+  const riskStyles = {
+    high: 'status-high',
+    medium: 'status-medium',
+    low: 'status-low',
+  };
+  return riskStyles[risk] || '';
+};
+
+// Helper function to get user initials
+const getInitials = (name) => {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+};
+
 export default function InmatesPage({ user }) {
   const [inmates, setInmates] = useState([]);
   const [filteredInmates, setFilteredInmates] = useState([]);
@@ -44,6 +63,8 @@ export default function InmatesPage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filterInmates = useCallback(() => {
@@ -71,27 +92,6 @@ export default function InmatesPage({ user }) {
   useEffect(() => {
     filterInmates();
   }, [filterInmates]);
-
-  const getRiskBadgeClass = (risk) => {
-    switch (risk) {
-      case 'high':
-        return 'status-high';
-      case 'medium':
-        return 'status-medium';
-      case 'low':
-        return 'status-low';
-      default:
-        return '';
-    }
-  };
-
-  const getInitials = (name) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
 
   if (loading) {
     return (

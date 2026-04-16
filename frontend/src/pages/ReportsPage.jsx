@@ -14,6 +14,16 @@ const API = `${BACKEND_URL}/api`;
 
 const COLORS = ['hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--chart-3))', 'hsl(var(--destructive))'];
 
+// Chart styling constants
+const CHART_TOOLTIP_STYLE = {
+  backgroundColor: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '0.5rem',
+};
+
+const BAR_RADIUS = [8, 8, 0, 0];
+const BAR_RADIUS_HORIZONTAL = [0, 8, 8, 0];
+
 export default function ReportsPage({ user }) {
   const [timeRange, setTimeRange] = useState('30days');
   const [reportType, setReportType] = useState('all');
@@ -34,6 +44,8 @@ export default function ReportsPage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange, reportType]);
 
   useEffect(() => {
@@ -239,15 +251,11 @@ export default function ReportsPage({ user }) {
                   <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" />
                   <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem',
-                    }}
+                    contentStyle={CHART_TOOLTIP_STYLE}
                   />
                   <Legend />
-                  <Bar dataKey="attended" fill="hsl(var(--success))" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="absent" fill="hsl(var(--destructive))" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="attended" fill="hsl(var(--success))" radius={BAR_RADIUS} />
+                  <Bar dataKey="absent" fill="hsl(var(--destructive))" radius={BAR_RADIUS} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -267,13 +275,9 @@ export default function ReportsPage({ user }) {
                   <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
                   <YAxis dataKey="program" type="category" stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem',
-                    }}
+                    contentStyle={CHART_TOOLTIP_STYLE}
                   />
-                  <Bar dataKey="completionRate" fill="hsl(var(--accent))" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="completionRate" fill="hsl(var(--accent))" radius={BAR_RADIUS_HORIZONTAL} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -293,11 +297,7 @@ export default function ReportsPage({ user }) {
                   <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                   <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem',
-                    }}
+                    contentStyle={CHART_TOOLTIP_STYLE}
                   />
                   <Legend />
                   <Line type="monotone" dataKey="avgScore" stroke="hsl(var(--success))" strokeWidth={2} name="Avg Behavior Score" />
