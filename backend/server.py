@@ -35,7 +35,64 @@ logger = logging.getLogger(__name__)
 
 
 # Mock Data Generation
+STAFF_DATA = [
+    {
+        "name": "Dr. Sarah Johnson",
+        "role": "counselor",
+        "specialization": "Behavioral Psychology",
+        "email": "s.johnson@rehab.com",
+        "phone": "+1 (555) 123-4567",
+        "caseload": 12,
+        "sessionsThisWeek": 8,
+        "experience": 8,
+        "performanceRating": 94,
+        "workloadStatus": "Optimal",
+        "certifications": ["LMHC", "CBT", "Trauma-Informed Care"]
+    },
+    {
+        "name": "Michael Chen",
+        "role": "therapist",
+        "specialization": "Substance Abuse Counseling",
+        "email": "m.chen@rehab.com",
+        "phone": "+1 (555) 234-5678",
+        "caseload": 15,
+        "sessionsThisWeek": 12,
+        "experience": 6,
+        "performanceRating": 91,
+        "workloadStatus": "High",
+        "certifications": ["CADC", "MINT", "Crisis Intervention"]
+    },
+    {
+        "name": "Emily Rodriguez",
+        "role": "educator",
+        "specialization": "Adult Education",
+        "email": "e.rodriguez@rehab.com",
+        "phone": "+1 (555) 345-6789",
+        "caseload": 10,
+        "sessionsThisWeek": 6,
+        "experience": 5,
+        "performanceRating": 89,
+        "workloadStatus": "Optimal",
+        "certifications": ["GED Instructor", "ESL", "Vocational Training"]
+    },
+    {
+        "name": "David Martinez",
+        "role": "coordinator",
+        "specialization": "Program Management",
+        "email": "d.martinez@rehab.com",
+        "phone": "+1 (555) 456-7890",
+        "caseload": 8,
+        "sessionsThisWeek": 5,
+        "experience": 10,
+        "performanceRating": 96,
+        "workloadStatus": "Optimal",
+        "certifications": ["PMP", "Case Management", "Risk Assessment"]
+    }
+]
+
+
 def generate_mock_inmates():
+    """Generate mock inmate data for demo purposes"""
     names = [
         "John Doe", "Michael Smith", "David Johnson", "James Wilson",
         "Robert Brown", "William Jones", "Richard Davis", "Charles Miller",
@@ -83,68 +140,15 @@ def generate_mock_inmates():
 
 
 def generate_mock_staff():
-    staff_members = [
-        {
-            "id": str(uuid.uuid4()),
-            "name": "Dr. Sarah Johnson",
-            "role": "counselor",
-            "specialization": "Behavioral Psychology",
-            "email": "s.johnson@rehab.com",
-            "phone": "+1 (555) 123-4567",
-            "caseload": 12,
-            "sessionsThisWeek": 8,
-            "experience": 8,
-            "performanceRating": 94,
-            "workloadStatus": "Optimal",
-            "certifications": ["LMHC", "CBT", "Trauma-Informed Care"]
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "name": "Michael Chen",
-            "role": "therapist",
-            "specialization": "Substance Abuse Counseling",
-            "email": "m.chen@rehab.com",
-            "phone": "+1 (555) 234-5678",
-            "caseload": 15,
-            "sessionsThisWeek": 12,
-            "experience": 6,
-            "performanceRating": 91,
-            "workloadStatus": "High",
-            "certifications": ["CADC", "MINT", "Crisis Intervention"]
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "name": "Emily Rodriguez",
-            "role": "educator",
-            "specialization": "Adult Education",
-            "email": "e.rodriguez@rehab.com",
-            "phone": "+1 (555) 345-6789",
-            "caseload": 10,
-            "sessionsThisWeek": 6,
-            "experience": 5,
-            "performanceRating": 89,
-            "workloadStatus": "Optimal",
-            "certifications": ["GED Instructor", "ESL", "Vocational Training"]
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "name": "David Martinez",
-            "role": "coordinator",
-            "specialization": "Program Management",
-            "email": "d.martinez@rehab.com",
-            "phone": "+1 (555) 456-7890",
-            "caseload": 8,
-            "sessionsThisWeek": 5,
-            "experience": 10,
-            "performanceRating": 96,
-            "workloadStatus": "Optimal",
-            "certifications": ["PMP", "Case Management", "Risk Assessment"]
-        }
+    """Generate mock staff data from predefined template"""
+    return [
+        {**member, "id": str(uuid.uuid4())} 
+        for member in STAFF_DATA
     ]
-    return staff_members
 
 
 def generate_mock_sessions():
+    """Generate mock session data for demo purposes"""
     session_types = ["counseling", "vocational", "educational", "therapy"]
     sessions = []
     dates = ["2024-01-15", "2024-01-16", "2024-01-17", "2024-01-18", "2024-01-19"]
@@ -170,6 +174,32 @@ def generate_mock_sessions():
 @api_router.get("/")
 async def root():
     return {"message": "Rehabilitation Dashboard API"}
+
+
+@api_router.post("/auth/login")
+async def login(credentials: dict):
+    """Authenticate user - Demo implementation"""
+    email = credentials.get("email")
+    password = credentials.get("password")
+    
+    # Demo authentication - in production, use proper auth with hashed passwords
+    demo_users = {
+        "admin@rehab.com": {"role": "admin", "name": "Admin User"},
+        "counselor@rehab.com": {"role": "counselor", "name": "Sarah Johnson"},
+        "manager@rehab.com": {"role": "manager", "name": "Michael Chen"},
+    }
+    
+    if email in demo_users and password == "demo123":
+        user_data = demo_users[email]
+        return {
+            "email": email,
+            "name": user_data["name"],
+            "role": user_data["role"]
+        }
+    
+    # Return 401 for invalid credentials
+    from fastapi import HTTPException
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 @api_router.get("/dashboard/overview")

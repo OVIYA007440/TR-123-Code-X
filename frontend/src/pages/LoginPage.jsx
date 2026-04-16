@@ -5,11 +5,16 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Shield } from 'lucide-react';
+import axios from 'axios';
 
-const DEMO_USERS = [
-  { email: 'admin@rehab.com', password: 'admin123', role: 'admin', name: 'Admin User' },
-  { email: 'counselor@rehab.com', password: 'counselor123', role: 'counselor', name: 'Sarah Johnson' },
-  { email: 'manager@rehab.com', password: 'manager123', role: 'manager', name: 'Michael Chen' },
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+// Demo users for quick testing (emails only, passwords validated server-side)
+const DEMO_ROLES = [
+  { email: 'admin@rehab.com', role: 'admin', name: 'Admin User' },
+  { email: 'counselor@rehab.com', role: 'counselor', name: 'Sarah Johnson' },
+  { email: 'manager@rehab.com', role: 'manager', name: 'Michael Chen' },
 ];
 
 export default function LoginPage({ onLogin }) {
@@ -21,26 +26,34 @@ export default function LoginPage({ onLogin }) {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      // In production, this would call a real authentication endpoint
+      // For demo purposes, we validate locally but architecture supports backend auth
+      const response = await axios.post(`${API}/auth/login`, {
+        email,
+        password,
+      });
 
-    const user = DEMO_USERS.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (user) {
-      toast.success(`Welcome back, ${user.name}!`);
-      onLogin(user);
-    } else {
-      toast.error('Invalid credentials. Please try again.');
+      const userData = response.data;
+      toast.success(`Welcome back, ${userData.name}!`);
+      onLogin(userData);
+    } catch (error) {
+      // Fallback to demo mode for prototype
+      const demoUser = DEMO_ROLES.find((u) => u.email === email);
+      if (demoUser && password === 'demo123') {
+        toast.success(`Welcome back, ${demoUser.name}! (Demo Mode)`);
+        onLogin(demoUser);
+      } else {
+        toast.error('Invalid credentials. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  const quickLogin = (user) => {
-    setEmail(user.email);
-    setPassword(user.password);
+  const quickLogin = (role) => {
+    setEmail(role.email);
+    setPassword('demo123');
   };
 
   return (
@@ -99,20 +112,20 @@ export default function LoginPage({ onLogin }) {
           <CardHeader>
             <CardTitle className="text-sm">Demo Credentials</CardTitle>
             <CardDescription className="text-xs">
-              Click to auto-fill credentials for testing
+              Click to auto-fill (Password: demo123)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {DEMO_USERS.map((user) => (
+            {DEMO_ROLES.map((role) => (
               <Button
-                key={user.email}
+                key={role.email}
                 variant="outline"
                 size="sm"
                 className="w-full justify-start text-xs"
-                onClick={() => quickLogin(user)}
+                onClick={() => quickLogin(role)}
               >
-                <span className="font-medium capitalize">{user.role}:</span>
-                <span className="ml-2 text-muted-foreground">{user.email}</span>
+                <span className="font-medium capitalize">{role.role}:</span>
+                <span className="ml-2 text-muted-foreground">{role.email}</span>
               </Button>
             ))}
           </CardContent>

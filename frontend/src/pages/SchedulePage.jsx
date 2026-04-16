@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,31 +30,33 @@ export default function SchedulePage({ user }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSessions();
-  }, []);
-
-  useEffect(() => {
-    filterSessionsByDate();
-  }, [date, sessions]);
-
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/sessions`);
       setSessions(response.data);
     } catch (error) {
-      console.error('Error fetching sessions:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching sessions:', error);
+      }
       toast.error('Failed to load sessions');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterSessionsByDate = () => {
+  const filterSessionsByDate = useCallback(() => {
     const selectedDate = format(date, 'yyyy-MM-dd');
     const filtered = sessions.filter((session) => session.date === selectedDate);
     setFilteredSessions(filtered);
-  };
+  }, [date, sessions]);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
+
+  useEffect(() => {
+    filterSessionsByDate();
+  }, [filterSessionsByDate]);
 
   const getSessionColor = (type) => {
     switch (type) {

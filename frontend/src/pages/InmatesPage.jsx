@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,28 +31,22 @@ export default function InmatesPage({ user }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchInmates();
-  }, []);
-
-  useEffect(() => {
-    filterInmates();
-  }, [searchTerm, riskFilter, inmates]);
-
-  const fetchInmates = async () => {
+  const fetchInmates = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/inmates`);
       setInmates(response.data);
       setFilteredInmates(response.data);
     } catch (error) {
-      console.error('Error fetching inmates:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching inmates:', error);
+      }
       toast.error('Failed to load inmates data');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterInmates = () => {
+  const filterInmates = useCallback(() => {
     let filtered = inmates;
 
     if (searchTerm) {
@@ -68,7 +62,15 @@ export default function InmatesPage({ user }) {
     }
 
     setFilteredInmates(filtered);
-  };
+  }, [inmates, searchTerm, riskFilter]);
+
+  useEffect(() => {
+    fetchInmates();
+  }, [fetchInmates]);
+
+  useEffect(() => {
+    filterInmates();
+  }, [filterInmates]);
 
   const getRiskBadgeClass = (risk) => {
     switch (risk) {
@@ -199,8 +201,8 @@ export default function InmatesPage({ user }) {
               <div>
                 <p className="text-xs text-muted-foreground mb-2">Active Programs</p>
                 <div className="flex flex-wrap gap-1">
-                  {inmate.programs.map((program, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
+                  {inmate.programs.map((program) => (
+                    <Badge key={`${inmate.id}-${program}`} variant="secondary" className="text-xs">
                       {program}
                     </Badge>
                   ))}
@@ -283,8 +285,8 @@ export default function InmatesPage({ user }) {
                     <div>
                       <h3 className="text-sm font-semibold mb-3">Active Programs</h3>
                       <div className="space-y-2">
-                        {inmate.programs.map((program, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-muted">
+                        {inmate.programs.map((program) => (
+                          <div key={`${inmate.id}-detail-${program}`} className="flex items-center justify-between p-3 rounded-lg bg-muted">
                             <span className="text-sm font-medium">{program}</span>
                             <Badge variant="secondary">In Progress</Badge>
                           </div>
@@ -296,8 +298,8 @@ export default function InmatesPage({ user }) {
                     <div>
                       <h3 className="text-sm font-semibold mb-3">Recent Notes</h3>
                       <div className="space-y-2">
-                        {inmate.recentNotes?.map((note, idx) => (
-                          <div key={idx} className="p-3 rounded-lg bg-muted">
+                        {inmate.recentNotes?.map((note) => (
+                          <div key={`${inmate.id}-note-${note.date}`} className="p-3 rounded-lg bg-muted">
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-xs font-medium">{note.author}</span>
                               <span className="text-xs text-muted-foreground">{note.date}</span>

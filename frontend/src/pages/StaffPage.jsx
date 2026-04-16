@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -15,21 +15,23 @@ export default function StaffPage({ user }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchStaff();
-  }, []);
-
-  const fetchStaff = async () => {
+  const fetchStaff = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/staff`);
       setStaff(response.data);
     } catch (error) {
-      console.error('Error fetching staff:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching staff:', error);
+      }
       toast.error('Failed to load staff data');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
 
   const getInitials = (name) => {
     return name
@@ -204,8 +206,8 @@ export default function StaffPage({ user }) {
               <div>
                 <p className="text-xs text-muted-foreground mb-2">Certifications</p>
                 <div className="flex flex-wrap gap-1">
-                  {member.certifications.map((cert, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
+                  {member.certifications.map((cert) => (
+                    <Badge key={cert} variant="secondary" className="text-xs">
                       {cert}
                     </Badge>
                   ))}

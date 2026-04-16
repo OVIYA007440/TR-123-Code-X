@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,11 +17,7 @@ export default function OverviewPage({ user }) {
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/dashboard/overview`);
       setStats(response.data.stats);
@@ -29,12 +25,18 @@ export default function OverviewPage({ user }) {
       setRiskData(response.data.riskData);
       setRecentAlerts(response.data.recentAlerts);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching dashboard data:', error);
+      }
       toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const handleExport = async () => {
     toast.success('Report export started. Download will begin shortly.');

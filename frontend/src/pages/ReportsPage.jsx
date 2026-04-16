@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,23 +20,25 @@ export default function ReportsPage({ user }) {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange, reportType]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/reports/analytics`, {
         params: { timeRange, reportType }
       });
       setAnalyticsData(response.data);
     } catch (error) {
-      console.error('Error fetching analytics:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching analytics:', error);
+      }
       toast.error('Failed to load analytics data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeRange, reportType]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   const handleExport = (format) => {
     toast.success(`Exporting report as ${format.toUpperCase()}...`);
