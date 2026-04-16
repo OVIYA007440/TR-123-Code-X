@@ -43,6 +43,7 @@ export default function SchedulePage({ user }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionNotes, setSessionNotes] = useState([]);
   const [noteContent, setNoteContent] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchSessions = useCallback(async () => {
@@ -81,22 +82,49 @@ export default function SchedulePage({ user }) {
   }, []);
 
   const handleUploadNote = async () => {
-    if (!noteContent.trim() || !selectedSession) return;
+    if ((!noteContent.trim() && !selectedFile) || !selectedSession) return;
 
     try {
+      let fileUrl = '';
+      let fileName = '';
+
+      // If file is selected, simulate upload (in production, upload to storage service)
+      if (selectedFile) {
+        fileName = selectedFile.name;
+        // Simulate file URL (in production, upload to cloud storage and get URL)
+        fileUrl = `https://storage.example.com/session-notes/${Date.now()}_${fileName}`;
+      }
+
       await axios.post(`${API}/session-notes`, {
         sessionId: selectedSession.id,
         sessionTitle: selectedSession.title,
         date: selectedSession.date,
         author: user.name,
-        content: noteContent,
+        content: noteContent || `Uploaded document: ${fileName}`,
         attendees: [],
+        fileUrl: fileUrl,
+        fileName: fileName,
       });
       toast.success('Session note uploaded successfully');
       setNoteContent('');
+      setSelectedFile(null);
       fetchSessionNotes(selectedSession.id);
     } catch (error) {
       toast.error('Failed to upload session note');
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+      if (allowedTypes.includes(file.type)) {
+        setSelectedFile(file);
+        toast.success(`File selected: ${file.name}`);
+      } else {
+        toast.error('Please select a PDF, DOC, DOCX, or TXT file');
+      }
     }
   };
 
@@ -382,7 +410,48 @@ export default function SchedulePage({ user }) {
                     rows={4}
                     className="resize-none"
                   />
-                  <Button onClick={handleUploadNote} size="sm" disabled={!noteContent.trim()}>
+                  
+                  {/* File Upload Section */}
+                  <div className="space-y-2">
+                    <Label htmlFor="file-upload" className="text-sm font-medium">
+                      Or upload a document (PDF, DOC, DOCX, TXT)
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="file-upload"
+                        type="file"
+                        accept=".pdf,.doc,.docx,.txt"
+                        onChange={handleFileSelect}
+                        className="flex-1"
+                      />
+                      {selectedFile && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedFile(null)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    {selectedFile && (
+                      <div className="flex items-center gap-2 p-2 bg-muted rounded text-sm">
+                        <FileText className="w-4 h-4 text-accent" />
+                        <span className="flex-1 truncate">{selectedFile.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {(selectedFile.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <Button 
+                    onClick={handleUploadNote} 
+                    size="sm" 
+                    disabled={!noteContent.trim() && !selectedFile}
+                    className="w-full"
+                  >
                     Upload Note
                   </Button>
                 </CardContent>
@@ -417,9 +486,23 @@ export default function SchedulePage({ user }) {
                       <CardContent>
                         <p className="text-sm whitespace-pre-wrap">{note.content}</p>
                         {note.fileName && (
-                          <div className="mt-3 p-2 bg-muted rounded flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">{note.fileName}</span>
+                          <div className="mt-3 p-3 bg-muted rounded-lg border border-border">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-5 h-5 text-accent" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{note.fileName}</p>
+                                {note.fileUrl && (
+                                  <a 
+                                    href={note.fileUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-accent hover:underline"
+                                  >
+                                    Download file
+                                  </a>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         )}
                       </CardContent>
