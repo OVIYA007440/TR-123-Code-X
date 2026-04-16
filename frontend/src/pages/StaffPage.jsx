@@ -56,9 +56,7 @@ export default function StaffPage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports - intentionally not included
 
   useEffect(() => {
     fetchStaff();

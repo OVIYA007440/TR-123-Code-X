@@ -73,9 +73,7 @@ export default function InmatesPage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   const filterInmates = useCallback(() => {
     let filtered = inmates;

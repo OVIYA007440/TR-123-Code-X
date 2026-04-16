@@ -66,9 +66,7 @@ export default function AbsenceManagementPage({ user }) {
       }
       toast.error('Failed to load absences');
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   const fetchReport = useCallback(async () => {
     try {
@@ -82,9 +80,7 @@ export default function AbsenceManagementPage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   useEffect(() => {
     fetchAbsences();

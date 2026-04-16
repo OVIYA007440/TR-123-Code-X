@@ -60,9 +60,7 @@ export default function SchedulePage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   const filterSessionsByDate = useCallback(() => {
     const selectedDate = format(date, 'yyyy-MM-dd');
@@ -80,9 +78,7 @@ export default function SchedulePage({ user }) {
       }
       toast.error('Failed to load session notes');
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   const openNotesDialog = (session) => {
     setSelectedSession(session);

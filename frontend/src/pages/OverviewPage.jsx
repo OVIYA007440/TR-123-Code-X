@@ -59,9 +59,7 @@ export default function OverviewPage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports - no need to include in deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // API, axios, toast are stable imports
 
   useEffect(() => {
     fetchDashboardData();

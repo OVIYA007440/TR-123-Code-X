@@ -44,9 +44,7 @@ export default function ReportsPage({ user }) {
     } finally {
       setLoading(false);
     }
-    // API, axios, toast are stable imports
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeRange, reportType]);
+  }, [timeRange, reportType]); // API, axios, toast are stable imports
 
   useEffect(() => {
     fetchAnalytics();
