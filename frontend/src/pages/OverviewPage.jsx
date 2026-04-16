@@ -20,6 +20,23 @@ const CHART_TOOLTIP_STYLE = {
 const CHART_DOT_STYLE = { fill: 'hsl(var(--accent))' };
 const BAR_RADIUS = [8, 8, 0, 0];
 
+// Helper functions for severity styling
+const getSeverityIconColor = (severity) => {
+  const colorMap = {
+    high: 'text-destructive',
+    medium: 'text-warning',
+  };
+  return colorMap[severity] || 'text-muted-foreground';
+};
+
+const getSeverityBadgeClass = (severity) => {
+  const classMap = {
+    high: 'status-high',
+    medium: 'status-medium',
+  };
+  return classMap[severity] || 'status-low';
+};
+
 export default function OverviewPage({ user }) {
   const [stats, setStats] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
@@ -195,19 +212,11 @@ export default function OverviewPage({ user }) {
             ) : (
               recentAlerts.map((alert) => (
                 <div key={alert.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                  <AlertTriangle className={`w-5 h-5 mt-0.5 ${
-                    alert.severity === 'high' ? 'text-destructive' :
-                    alert.severity === 'medium' ? 'text-warning' :
-                    'text-muted-foreground'
-                  }`} />
+                  <AlertTriangle className={`w-5 h-5 mt-0.5 ${getSeverityIconColor(alert.severity)}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-medium">{alert.title}</p>
-                      <Badge variant="outline" className={`text-xs ${
-                        alert.severity === 'high' ? 'status-high' :
-                        alert.severity === 'medium' ? 'status-medium' :
-                        'status-low'
-                      }`}>
+                      <Badge variant="outline" className={`text-xs ${getSeverityBadgeClass(alert.severity)}`}>
                         {alert.severity}
                       </Badge>
                     </div>

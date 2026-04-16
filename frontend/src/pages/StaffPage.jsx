@@ -20,6 +20,15 @@ const getInitials = (name) => {
     .toUpperCase();
 };
 
+// Helper function to get workload status color
+const getWorkloadColor = (status) => {
+  const colorMap = {
+    'Optimal': 'bg-success/10 text-success',
+    'High': 'bg-warning/10 text-warning',
+  };
+  return colorMap[status] || 'bg-muted';
+};
+
 // Helper function to get role color
 const getRoleColor = (role) => {
   const colorMap = {
@@ -191,11 +200,7 @@ export default function StaffPage({ user }) {
                 </div>
                 <Badge
                   variant="secondary"
-                  className={`text-xs ${
-                    member.workloadStatus === 'Optimal' ? 'bg-success/10 text-success' :
-                    member.workloadStatus === 'High' ? 'bg-warning/10 text-warning' :
-                    'bg-muted'
-                  }`}
+                  className={`text-xs ${getWorkloadColor(member.workloadStatus)}`}
                 >
                   {member.workloadStatus}
                 </Badge>

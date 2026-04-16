@@ -31,6 +31,7 @@ const CHART_TOOLTIP_STYLE = {
 };
 
 const REASON_COLORS = ['hsl(var(--destructive))', 'hsl(var(--warning))', 'hsl(var(--chart-3))', 'hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--muted-foreground))'];
+const BAR_RADIUS_HORIZONTAL = [0, 8, 8, 0];
 
 const getPriorityColor = (priority) => {
   const colors = {
@@ -65,6 +66,7 @@ export default function AbsenceManagementPage({ user }) {
       }
       toast.error('Failed to load absences');
     }
+    // API, axios, toast are stable imports
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -80,6 +82,7 @@ export default function AbsenceManagementPage({ user }) {
     } finally {
       setLoading(false);
     }
+    // API, axios, toast are stable imports
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -320,7 +323,7 @@ export default function AbsenceManagementPage({ user }) {
                     <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
                     <YAxis dataKey="reason" type="category" stroke="hsl(var(--muted-foreground))" width={120} />
                     <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-                    <Bar dataKey="count" fill="hsl(var(--accent))" radius={[0, 8, 8, 0]} />
+                    <Bar dataKey="count" fill="hsl(var(--accent))" radius={BAR_RADIUS_HORIZONTAL} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -381,8 +384,8 @@ export default function AbsenceManagementPage({ user }) {
                     <div>
                       <p className="text-sm font-medium mb-2">Action Items:</p>
                       <ul className="space-y-2">
-                        {suggestion.actionItems.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm">
+                        {suggestion.actionItems.map((item) => (
+                          <li key={`${index}-${item.substring(0, 20)}`} className="flex items-start gap-2 text-sm">
                             <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
                             <span>{item}</span>
                           </li>

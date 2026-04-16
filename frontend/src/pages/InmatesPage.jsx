@@ -41,6 +41,16 @@ const getInitials = (name) => {
     .toUpperCase();
 };
 
+// Helper function to get risk icon color
+const getRiskIconColor = (risk) => {
+  const colorMap = {
+    high: 'text-destructive',
+    medium: 'text-warning',
+    low: 'text-success',
+  };
+  return colorMap[risk] || 'text-muted-foreground';
+};
+
 export default function InmatesPage({ user }) {
   const [inmates, setInmates] = useState([]);
   const [filteredInmates, setFilteredInmates] = useState([]);
@@ -246,11 +256,7 @@ export default function InmatesPage({ user }) {
                     <div>
                       <h3 className="text-sm font-semibold mb-3">Risk Assessment</h3>
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-muted">
-                        <AlertCircle className={`w-5 h-5 ${
-                          inmate.riskLevel === 'high' ? 'text-destructive' :
-                          inmate.riskLevel === 'medium' ? 'text-warning' :
-                          'text-success'
-                        }`} />
+                        <AlertCircle className={`w-5 h-5 ${getRiskIconColor(inmate.riskLevel)}`} />
                         <div className="flex-1">
                           <p className="text-sm font-medium">Current Risk Level: <span className="capitalize">{inmate.riskLevel}</span></p>
                           <p className="text-xs text-muted-foreground mt-1">{inmate.riskNotes}</p>

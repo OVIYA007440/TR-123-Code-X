@@ -319,88 +319,110 @@ async def create_absence(absence: dict):
     return {"success": True, "absence": absence_record}
 
 
-@api_router.get("/absences/report")
-async def get_absence_report():
-    """Get monthly absence report with AI suggestions"""
+def generate_absence_statistics():
+    """Generate absence statistics for monthly report"""
     return {
         "month": "January 2024",
         "totalAbsences": 87,
         "previousMonth": 62,
         "percentageChange": 40.3,
-        "topReasons": [
-            {"reason": "Medical Issues", "count": 23, "percentage": 26.4},
-            {"reason": "Family Emergency", "count": 18, "percentage": 20.7},
-            {"reason": "Behavioral Issues", "count": 15, "percentage": 17.2},
-            {"reason": "Mental Health", "count": 12, "percentage": 13.8},
-            {"reason": "Scheduling Conflict", "count": 10, "percentage": 11.5},
-            {"reason": "Other", "count": 9, "percentage": 10.4}
-        ],
-        "aiSuggestions": [
-            {
-                "priority": "high",
-                "category": "Medical Support",
-                "title": "Increase Healthcare Access",
-                "description": "Medical issues account for 26.4% of absences. Consider implementing weekly health screenings and expanding medical staff availability.",
-                "expectedImpact": "Could reduce medical-related absences by 40-50%",
-                "actionItems": [
-                    "Schedule bi-weekly health check-ups for high-risk inmates",
-                    "Partner with local healthcare providers for on-site services",
-                    "Create a medical appointment reminder system"
-                ]
-            },
-            {
-                "priority": "high",
-                "category": "Family Communication",
-                "title": "Enhanced Family Communication Program",
-                "description": "Family emergencies contribute to 20.7% of absences. Improving family communication channels could reduce crisis situations.",
-                "expectedImpact": "Could reduce family-related absences by 30-35%",
-                "actionItems": [
-                    "Increase video call frequency from weekly to bi-weekly",
-                    "Implement family support counseling sessions",
-                    "Create emergency family contact protocol"
-                ]
-            },
-            {
-                "priority": "medium",
-                "category": "Behavioral Intervention",
-                "title": "Proactive Behavioral Support",
-                "description": "17.2% of absences stem from behavioral issues. Early intervention programs can prevent escalation.",
-                "expectedImpact": "Could reduce behavior-related absences by 25-30%",
-                "actionItems": [
-                    "Implement daily check-ins for inmates with behavioral flags",
-                    "Introduce conflict resolution workshops",
-                    "Assign peer mentors for behavioral support"
-                ]
-            },
-            {
-                "priority": "medium",
-                "category": "Mental Health",
-                "title": "Mental Health First Response",
-                "description": "Mental health issues account for 13.8% of absences. Additional mental health resources are needed.",
-                "expectedImpact": "Could reduce mental health absences by 35-40%",
-                "actionItems": [
-                    "Hire additional mental health counselors",
-                    "Create 24/7 mental health crisis hotline",
-                    "Implement mindfulness and stress management programs"
-                ]
-            },
-            {
-                "priority": "low",
-                "category": "Scheduling",
-                "title": "Flexible Scheduling System",
-                "description": "11.5% of absences are due to scheduling conflicts. A more flexible system could help.",
-                "expectedImpact": "Could reduce scheduling conflicts by 20-25%",
-                "actionItems": [
-                    "Allow inmates to request schedule adjustments 48 hours in advance",
-                    "Implement rotating session times to accommodate different needs",
-                    "Create make-up session opportunities"
-                ]
-            }
-        ],
-        "trendsAnalysis": {
-            "description": "Absence rates have increased 40.3% compared to last month, primarily driven by seasonal medical issues (flu season) and increased family emergencies during the holiday period.",
-            "forecast": "Based on historical data, absence rates are expected to normalize in February, decreasing by approximately 25-30% as seasonal factors subside."
+    }
+
+
+def generate_top_reasons():
+    """Generate top absence reasons with counts"""
+    return [
+        {"reason": "Medical Issues", "count": 23, "percentage": 26.4},
+        {"reason": "Family Emergency", "count": 18, "percentage": 20.7},
+        {"reason": "Behavioral Issues", "count": 15, "percentage": 17.2},
+        {"reason": "Mental Health", "count": 12, "percentage": 13.8},
+        {"reason": "Scheduling Conflict", "count": 10, "percentage": 11.5},
+        {"reason": "Other", "count": 9, "percentage": 10.4}
+    ]
+
+
+def generate_ai_suggestions():
+    """Generate AI-powered recommendations for absence reduction"""
+    return [
+        {
+            "priority": "high",
+            "category": "Medical Support",
+            "title": "Increase Healthcare Access",
+            "description": "Medical issues account for 26.4% of absences. Consider implementing weekly health screenings and expanding medical staff availability.",
+            "expectedImpact": "Could reduce medical-related absences by 40-50%",
+            "actionItems": [
+                "Schedule bi-weekly health check-ups for high-risk inmates",
+                "Partner with local healthcare providers for on-site services",
+                "Create a medical appointment reminder system"
+            ]
+        },
+        {
+            "priority": "high",
+            "category": "Family Communication",
+            "title": "Enhanced Family Communication Program",
+            "description": "Family emergencies contribute to 20.7% of absences. Improving family communication channels could reduce crisis situations.",
+            "expectedImpact": "Could reduce family-related absences by 30-35%",
+            "actionItems": [
+                "Increase video call frequency from weekly to bi-weekly",
+                "Implement family support counseling sessions",
+                "Create emergency family contact protocol"
+            ]
+        },
+        {
+            "priority": "medium",
+            "category": "Behavioral Intervention",
+            "title": "Proactive Behavioral Support",
+            "description": "17.2% of absences stem from behavioral issues. Early intervention programs can prevent escalation.",
+            "expectedImpact": "Could reduce behavior-related absences by 25-30%",
+            "actionItems": [
+                "Implement daily check-ins for inmates with behavioral flags",
+                "Introduce conflict resolution workshops",
+                "Assign peer mentors for behavioral support"
+            ]
+        },
+        {
+            "priority": "medium",
+            "category": "Mental Health",
+            "title": "Mental Health First Response",
+            "description": "Mental health issues account for 13.8% of absences. Additional mental health resources are needed.",
+            "expectedImpact": "Could reduce mental health absences by 35-40%",
+            "actionItems": [
+                "Hire additional mental health counselors",
+                "Create 24/7 mental health crisis hotline",
+                "Implement mindfulness and stress management programs"
+            ]
+        },
+        {
+            "priority": "low",
+            "category": "Scheduling",
+            "title": "Flexible Scheduling System",
+            "description": "11.5% of absences are due to scheduling conflicts. A more flexible system could help.",
+            "expectedImpact": "Could reduce scheduling conflicts by 20-25%",
+            "actionItems": [
+                "Allow inmates to request schedule adjustments 48 hours in advance",
+                "Implement rotating session times to accommodate different needs",
+                "Create make-up session opportunities"
+            ]
         }
+    ]
+
+
+def generate_trends_analysis():
+    """Generate trends analysis and forecast"""
+    return {
+        "description": "Absence rates have increased 40.3% compared to last month, primarily driven by seasonal medical issues (flu season) and increased family emergencies during the holiday period.",
+        "forecast": "Based on historical data, absence rates are expected to normalize in February, decreasing by approximately 25-30% as seasonal factors subside."
+    }
+
+
+@api_router.get("/absences/report")
+async def get_absence_report():
+    """Get monthly absence report with AI suggestions"""
+    return {
+        **generate_absence_statistics(),
+        "topReasons": generate_top_reasons(),
+        "aiSuggestions": generate_ai_suggestions(),
+        "trendsAnalysis": generate_trends_analysis()
     }
 
 
