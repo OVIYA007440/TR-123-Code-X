@@ -8,6 +8,7 @@ import InmatesPage from '@/pages/InmatesPage';
 import SchedulePage from '@/pages/SchedulePage';
 import StaffPage from '@/pages/StaffPage';
 import ReportsPage from '@/pages/ReportsPage';
+import AbsenceManagementPage from '@/pages/AbsenceManagementPage';
 import SettingsPage from '@/pages/SettingsPage';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -60,6 +61,7 @@ function App() {
                     <Route path="/inmates" element={<InmatesPage user={user} />} />
                     <Route path="/schedule" element={<SchedulePage user={user} />} />
                     <Route path="/staff" element={<StaffPage user={user} />} />
+                    <Route path="/absences" element={<AbsenceManagementPage user={user} />} />
                     <Route path="/reports" element={<ReportsPage user={user} />} />
                     <Route path="/settings" element={<SettingsPage user={user} />} />
                   </Routes>

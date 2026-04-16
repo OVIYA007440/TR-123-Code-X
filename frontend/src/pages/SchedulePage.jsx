@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Clock, MapPin, Users, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Clock, MapPin, Users, Calendar as CalendarIcon, FileText, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -39,6 +39,10 @@ export default function SchedulePage({ user }) {
   const [sessions, setSessions] = useState([]);
   const [filteredSessions, setFilteredSessions] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionNotes, setSessionNotes] = useState([]);
+  const [noteContent, setNoteContent] = useState('');
   const [loading, setLoading] = useState(true);
 
   const fetchSessions = useCallback(async () => {
@@ -62,6 +66,45 @@ export default function SchedulePage({ user }) {
     const filtered = sessions.filter((session) => session.date === selectedDate);
     setFilteredSessions(filtered);
   }, [date, sessions]);
+
+  const fetchSessionNotes = useCallback(async (sessionId) => {
+    try {
+      const response = await axios.get(`${API}/session-notes/${sessionId}`);
+      setSessionNotes(response.data);
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching session notes:', error);
+      }
+      toast.error('Failed to load session notes');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleUploadNote = async () => {
+    if (!noteContent.trim() || !selectedSession) return;
+
+    try {
+      await axios.post(`${API}/session-notes`, {
+        sessionId: selectedSession.id,
+        sessionTitle: selectedSession.title,
+        date: selectedSession.date,
+        author: user.name,
+        content: noteContent,
+        attendees: [],
+      });
+      toast.success('Session note uploaded successfully');
+      setNoteContent('');
+      fetchSessionNotes(selectedSession.id);
+    } catch (error) {
+      toast.error('Failed to upload session note');
+    }
+  };
+
+  const openNotesDialog = (session) => {
+    setSelectedSession(session);
+    fetchSessionNotes(session.id);
+    setNotesDialogOpen(true);
+  };
 
   useEffect(() => {
     fetchSessions();
@@ -261,6 +304,15 @@ export default function SchedulePage({ user }) {
                       <Button size="sm" variant="outline" className="flex-1">
                         View Details
                       </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="gap-2"
+                        onClick={() => openNotesDialog(session)}
+                      >
+                        <FileText className="w-4 h-4" />
+                        Notes
+                      </Button>
                       {(user.role === 'admin' || user.role === 'manager') && (
                         <Button size="sm" variant="outline">
                           Edit
@@ -302,6 +354,83 @@ export default function SchedulePage({ user }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Session Notes Dialog */}
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Session Notes - {selectedSession?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedSession?.date} at {selectedSession?.time} | {selectedSession?.location}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Upload New Note */}
+            {(user.role === 'admin' || user.role === 'counselor' || user.role === 'manager') && (
+              <Card className="border-accent/20 bg-accent/5">
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    Add Session Note
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Textarea
+                    placeholder="Enter session notes, observations, outcomes..."
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    rows={4}
+                    className="resize-none"
+                  />
+                  <Button onClick={handleUploadNote} size="sm" disabled={!noteContent.trim()}>
+                    Upload Note
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Existing Notes */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Session History ({sessionNotes.length})</h3>
+              {sessionNotes.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No notes uploaded yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {sessionNotes.map((note) => (
+                    <Card key={note.id}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-sm font-medium">{note.author}</CardTitle>
+                            <CardDescription className="text-xs mt-1">
+                              {new Date(note.timestamp).toLocaleString()}
+                            </CardDescription>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {note.date}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm whitespace-pre-wrap">{note.content}</p>
+                        {note.fileName && (
+                          <div className="mt-3 p-2 bg-muted rounded flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">{note.fileName}</span>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

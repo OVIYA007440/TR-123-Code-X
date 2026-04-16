@@ -21,6 +21,7 @@ import {
   Menu,
   X,
   Shield,
+  CalendarX,
 } from 'lucide-react';
 
 const navigation = [
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'Inmates', href: '/inmates', icon: Users },
   { name: 'Schedule', href: '/schedule', icon: Calendar },
   { name: 'Staff', href: '/staff', icon: UserCircle },
+  { name: 'Absences', href: '/absences', icon: CalendarX },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
